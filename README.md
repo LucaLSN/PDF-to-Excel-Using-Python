@@ -15,10 +15,6 @@ O processamento foi desenvolvido para lidar com PDFs reais, incluindo:
 - 📄 Detecta automaticamente páginas com conteúdo no PDF
 - 📊 Extrai tabelas usando **Camelot**
 - 🧹 Corrige quebras de linha em células
-- 🧠 Aplica regras de negócio:
-  - Modalidade (Crédito / Débito)
-  - Bandeira (Visa, Mastercard, Elo, Amex)
-  - Número de parcelas
 - 📈 Consolida todas as tabelas em um único Excel
 - 🐳 Executável via **Docker** (sem dependências locais)
 
