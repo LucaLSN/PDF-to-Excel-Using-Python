@@ -3,14 +3,7 @@ import pdfplumber
 import camelot
 import pandas as pd
 
-
-def processar_pdf_para_excel(
-    pdf_path,
-    output_excel="tabelas_extraidas.xlsx",
-    coluna_quebra=1,
-    row_tol=15
-):
-    """
+"""
     Extrai tabelas de qualquer PDF e consolida em um Excel.
     
     Parâmetros:
@@ -20,9 +13,16 @@ def processar_pdf_para_excel(
     - row_tol: tolerância de linha do Camelot (stream)
     """
 
+def processar_pdf_para_excel(
+    pdf_path,
+    output_excel="tabelas_extraidas.xlsx",
+    coluna_quebra=1,
+    row_tol=15
+):
+
     paginas_validas = []
 
-    # 1. Identificar páginas com conteúdo
+    #identificação de conteúdo
     with pdfplumber.open(pdf_path) as pdf:
         for i, page in enumerate(pdf.pages, start=1):
             texto = page.extract_text()
@@ -32,7 +32,7 @@ def processar_pdf_para_excel(
     if not paginas_validas:
         raise ValueError("Nenhuma página com conteúdo textual encontrada no PDF.")
 
-    # 2. Extrair tabelas
+    #extração de conteúdo
     tables = camelot.read_pdf(
         pdf_path,
         pages=",".join(map(str, paginas_validas)),
@@ -46,13 +46,13 @@ def processar_pdf_para_excel(
 
     dataframes = []
 
-    # 3. Tratamento genérico das tabelas
+    
     for table in tables:
         df = table.df.copy()
 
         linhas_para_remover = []
 
-        # Tratamento de células quebradas entre linhas
+        
         for i in range(1, len(df)):
             atual = df.iloc[i, coluna_quebra]
             anterior = df.iloc[i - 1, coluna_quebra]
@@ -70,17 +70,16 @@ def processar_pdf_para_excel(
 
         dataframes.append(df)
 
-    # 4. Consolidação final
+   
     df_final = pd.concat(dataframes, ignore_index=True)
 
-    # Se a primeira linha parecer cabeçalho, usa como coluna
+    #se a primeira linha parecer cabeçalho, usa como coluna
     if df_final.iloc[0].duplicated().sum() == 0:
         df_final.columns = df_final.iloc[0]
         df_final = df_final[1:].reset_index(drop=True)
 
     df_final.columns = df_final.columns.astype(str).str.strip()
 
-    # 5. Exportação
     df_final.to_excel(output_excel, index=False)
 
     return output_excel
